@@ -1,12 +1,12 @@
 <?php
 
-namespace AppModels;
+namespace App\Models;
 
-use IlluminateFoundationAuthUser as Authenticatable;
-use IlluminateNotificationsNotifiable;
-use LaravelSanctumHasApiTokens;
-use IlluminateDatabaseEloquentRelationsBelongsTo;
-use IlluminateDatabaseEloquentRelationsHasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -37,10 +37,8 @@ class User extends Authenticatable
     }
 
     /**
-     * Recommended usage in controllers/services:
-     * User::withRoleAndPermissions()->find($id)
-     *
-     * The CheckPermission middleware and frontend rely on $user->role->permissions being loaded.
+     * Scope pour eager load le rôle et ses permissions.
+     * Usage recommandé : User::withRoleAndPermissions()->find($id)
      */
     public function scopeWithRoleAndPermissions($query)
     {

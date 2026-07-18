@@ -5,10 +5,12 @@ const API_BASE = '/api';
 export interface AuthResponse {
   access_token: string;
   token_type: string;
-  user: User & { role?: Role & { permissions?: any[] } };
+  user: User & { role?: Role & { permissions?: { name: string }[] } };
 }
 
-export async function login(credentials: any): Promise<AuthResponse> {
+export async function login(
+  credentials: { email: string; password: string }
+): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE}/login`, {
     method: 'POST',
     headers: {
@@ -19,11 +21,11 @@ export async function login(credentials: any): Promise<AuthResponse> {
   });
 
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || 'فشل تسجيل الدخول');
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'فشل تسجيل الدخول — تحقق من البريد وكلمة المرور');
   }
 
-  return await res.json();
+  return res.json();
 }
 
 export async function logout(): Promise<void> {
@@ -33,29 +35,24 @@ export async function logout(): Promise<void> {
   await fetch(`${API_BASE}/logout`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json',
     },
   });
+
+  localStorage.removeItem('token');
 }
 
 export async function fetchCurrentUser(): Promise<User> {
   const token = localStorage.getItem('token');
 
-  if (!token) {
-    throw new Error('غير مصرح');
-  }
-
   const res = await fetch(`${API_BASE}/user`, {
     headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json',
     },
   });
 
-  if (!res.ok) {
-    throw new Error('فشل جلب بيانات المستخدم');
-  }
-
-  return await res.json();
+  if (!res.ok) throw new Error('فشل جلب بيانات المستخدم');
+  return res.json();
 }
