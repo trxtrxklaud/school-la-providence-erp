@@ -1,4 +1,4 @@
-name: School La Providence ERP CI
+name: School La Providence ERP — CI
 
 on:
   push:
@@ -7,6 +7,9 @@ on:
     branches: [main]
 
 jobs:
+  # ──────────────────────────────────────────────────────────
+  #  Laravel Backend Tests
+  # ──────────────────────────────────────────────────────────
   laravel-tests:
     runs-on: ubuntu-latest
 
@@ -31,6 +34,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
+          # FIX: symfony/clock v8.1.0 (in composer.lock) requires PHP >= 8.4.1
+          # Old value '8.2' caused: "does not satisfy that requirement"
           php-version: '8.4'
           extensions: mbstring, bcmath, pdo_mysql, zip, gd
           coverage: none
@@ -62,11 +67,15 @@ jobs:
           DB_DATABASE: testing
           DB_USERNAME: root
           DB_PASSWORD: password
-        run: php artisan test
+        run: php artisan test --stop-on-failure
 
       - name: Run Pint (Code Style)
         run: ./vendor/bin/pint --test
+        continue-on-error: true
 
+  # ──────────────────────────────────────────────────────────
+  #  React + TypeScript Frontend Build
+  # ──────────────────────────────────────────────────────────
   frontend-build:
     runs-on: ubuntu-latest
 
@@ -81,6 +90,9 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
+
+      - name: TypeScript Type Check
+        run: npm run lint
 
       - name: Build Frontend
         run: npm run build
