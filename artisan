@@ -1,4 +1,4 @@
-#!/usr/bin/env php
+#!/usr/bin/env php error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 <?php
 
 define('LARAVEL_START', microtime(true));
