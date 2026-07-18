@@ -23,7 +23,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: '8.4'
           coverage: none
 
       - name: Get Composer Cache Directory
@@ -71,7 +71,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: '8.4'
           extensions: mbstring, bcmath, pdo_mysql, zip, gd
           coverage: none
 
@@ -148,7 +148,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: '8.4'
           extensions: mbstring, bcmath, pdo_mysql, zip, gd
           coverage: none
 
