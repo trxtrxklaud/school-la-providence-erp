@@ -1,53 +1,54 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace AppHttpControllers;
 
-use App\Models\User;
-use App\Models\Role;
-use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserRequest;
-use App\Services\UserService;
-use App\Http\Middleware\CheckPermission;
+use AppModelsUser;
+use AppModelsRole;
+use AppHttpRequestsStoreUserRequest;
+use AppHttpRequestsUpdateUserRequest;
+use AppServicesUserService;
+use AppHttpMiddlewareCheckPermission;
+use IlluminateRoutingControllersHasMiddleware;
+use IlluminateRoutingControllersMiddleware;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
-    protected $userService;
-
-    public function __construct(UserService $userService)
+    public static function middleware(): array
     {
-        $this->userService = $userService;
-        $this->middleware(CheckPermission::class.':users.view')->only(['index', 'show', 'roles']);
-        $this->middleware(CheckPermission::class.':users.create')->only('store');
-        $this->middleware(CheckPermission::class.':users.edit')->only('update');
-        $this->middleware(CheckPermission::class.':users.delete')->only('destroy');
+        return [
+            new Middleware(CheckPermission::class . ':users.view', only: ['index', 'show', 'roles']),
+            new Middleware(CheckPermission::class . ':users.create', only: ['store']),
+            new Middleware(CheckPermission::class . ':users.edit', only: ['update']),
+            new Middleware(CheckPermission::class . ':users.delete', only: ['destroy']),
+        ];
     }
 
-    public function index()
+    public function index(UserService $userService)
     {
-        $users = $this->userService->getAllUsers();
+        $users = $userService->getAllUsers();
         return response()->json($users);
     }
 
-    public function store(StoreUserRequest $request)
+    public function store(StoreUserRequest $request, UserService $userService)
     {
-        $user = $this->userService->createUser($request->validated());
+        $user = $userService->createUser($request->validated());
         return response()->json($user, 201);
     }
 
-    public function show(User $user)
+    public function show(User $user, UserService $userService)
     {
-        return response()->json($this->userService->getUser($user));
+        return response()->json($userService->getUser($user));
     }
 
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(UpdateUserRequest $request, User $user, UserService $userService)
     {
-        $updatedUser = $this->userService->updateUser($user, $request->validated());
+        $updatedUser = $userService->updateUser($user, $request->validated());
         return response()->json($updatedUser);
     }
 
-    public function destroy(User $user)
+    public function destroy(User $user, UserService $userService)
     {
-        $this->userService->deleteUser($user);
+        $userService->deleteUser($user);
         return response()->json(null, 204);
     }
 
@@ -56,3 +57,4 @@ class UserController extends Controller
         return response()->json(Role::all());
     }
 }
+
